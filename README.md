@@ -1,4 +1,7 @@
 asmos
 =====
 
-An ASM kernel project for x86 architecture
+The Asmos project is to write an open-source kernel written only in ASM.
+
+Start of projet : 2nd december of 2013
+
