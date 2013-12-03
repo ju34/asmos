@@ -8,6 +8,13 @@ jmp start
 start:
 	call _clear
 
+	mov eax, 5
+	push eax
+	push eax
+	call _gotoxy
+	pop eax
+	pop eax
+
 	mov eax, msg
 	push eax
 	call _printk

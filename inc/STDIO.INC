@@ -1,6 +1,6 @@
 %define 	SCREEN_BASE	0xB8000
 
-global _printk, _putcar, _SOL, _GNL, _setattr, _clear
+global _printk, _putcar, _setattr, _clear, _gotoxy
 
 ; VARIABLES ------------------------------------------------
 screen:
@@ -25,7 +25,9 @@ _printk:
 	cmp bl, 0	; Fin de chaine ?
 	jz .end
 	;mov bl, al
+	push ebx
 	call _putcar
+	pop ebx
 	jmp .start
 
 .end:
@@ -33,13 +35,16 @@ _printk:
 	ret
 
 ;-----------------------------------------------------------
-; Name   :
+; Name   : _putcar(char c)
 ; Desc.  : 
 ;-----------------------------------------------------------
 _putcar:
-	push eax
-	push edx
+	push ebp
+	mov ebp, esp
 
+	mov bl, byte [ebp+8]
+
+	push eax
 	mov eax, [screen+4]
 	mov edx, 0xA0
 	mul edx
@@ -66,8 +71,8 @@ _putcar:
 	call _GNL
 
 .end:
-	pop edx
 	pop eax
+	pop ebp
 	ret
 
 ;-----------------------------------------------------------
@@ -94,7 +99,7 @@ _GNL:
 	ret
 
 ;-----------------------------------------------------------
-; Name   : setattr(u8 attr)
+; Name   : _setattr(u8 attr)
 ; Desc.  : Set display attribute
 ;
 ; Param. : attr pushed in stack befor call function
@@ -110,7 +115,7 @@ _setattr:
 	ret
 
 ;-----------------------------------------------------------
-; Name   : clear()
+; Name   : _clear()
 ; Desc.  : Clear screen
 ;-----------------------------------------------------------
 _clear:
@@ -128,4 +133,25 @@ _clear:
 
 .end:
 	pop eax
+	ret
+
+;----------------------------------------------------------
+; Name   : _gotoxy(int x, int y)
+; Desc.  : Go to X, Y position on screen
+;----------------------------------------------------------
+_gotoxy:
+	push ebp
+	mov ebp, esp
+
+	push eax
+
+	mov eax, [ebp+8]
+	mov [screen], eax
+
+	mov eax, [ebp+12]
+	mov [screen+4], eax
+
+	pop eax
+	pop ebp
+
 	ret
