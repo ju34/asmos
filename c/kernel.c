@@ -1,3 +1,7 @@
+#include "include/gdt.h"
+#include "include/lib.h"
+#include "include/types.h"
+
 #define IDTSIZE	0xFF
 
 #define cli asm("cli"::)
@@ -33,14 +37,23 @@ extern void _init_idt_desc(struct idtdesc *desc, int offset, unsigned short sele
 extern void _asm_default_int();
 extern void _asm_keyboard_int();
 
-void *memcpy(char *dest, char *src, int size);
 void init_pic();
 void init_idt_desc(unsigned short select, unsigned int offset, unsigned short type, struct idtdesc *desc);
+void main();
 
 struct idtr kidtr;
 struct idtdesc kidt[IDTSIZE];
 
-void _start(void)
+void _start(){
+	init_gdt();
+	asm("	movw $0x18, %ax \n \
+		movw %ax, %ss \n \
+		movl $0x20000, %esp");
+
+	main();
+}
+
+void main(void)
 {
 	int i = 0;
 
@@ -92,14 +105,6 @@ void init_pic(void)
         /* masquage des interruptions */
         outb(0x21, 0x0);
         outb(0xA1, 0x0);
-}
-
-void *memcpy(char *dest, char *src, int size){
-	char *p = dest;
-	while(size--){
-		*dest++ = *src++;
-	}
-	return p;
 }
 
 void isr_default_int(){
