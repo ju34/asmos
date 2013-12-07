@@ -5,8 +5,12 @@ c: c/kernel.c inc/STDIO.INC bin/bootsect
 	mv inc/STDIO.o obj/stdio.o
 	nasm -f elf inc/INTERRUPT.INC
 	mv inc/INTERRUPT.o obj/interrupt.o
+	nasm -f elf inc/GDT.INC
+	mv inc/GDT.o obj/gdt.o
+	nasm -f elf inc/STRING.INC
+	mv inc/STRING.o obj/string.o
 	gcc -c c/kernel.c -o obj/kernel.o
-	ld --oformat binary -Ttext 1000 obj/kernel.o obj/stdio.o obj/interrupt.o -o bin/kernel_c
+	ld --oformat binary -Ttext 1000 obj/kernel.o obj/stdio.o obj/interrupt.o obj/gdt.o obj/string.o -o bin/kernel_c
 	cat bin/bootsect bin/kernel_c /dev/zero | dd of=img/boot_c.iso bs=512 count=2880
 	echo 6 | bochs 'boot:a' 'floppya: 1_44=img/boot_c.iso, status=inserted'
 

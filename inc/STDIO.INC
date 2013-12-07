@@ -132,6 +132,11 @@ _clear:
 	jmp .start
 
 .end:
+        push dword 0
+        push dword 0
+        call _gotoxy
+        add esp, 8
+
 	pop eax
 	ret
 

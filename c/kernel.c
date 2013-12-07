@@ -1,6 +1,7 @@
 #include "include/gdt.h"
-#include "include/lib.h"
 #include "include/types.h"
+#include "include/stdio.h"
+#include "include/string.h"
 
 #define IDTSIZE	0xFF
 
@@ -27,12 +28,6 @@ struct idtr{
 	unsigned int base;
 } __attribute__ ((packed));
 
-extern void _setattr(unsigned char attr);
-extern void _clear();
-extern void _printk(unsigned char *str);
-extern void _putcar(unsigned char c);
-extern void _gotoxy(int x, int y);
-extern void _init_idt_desc(struct idtdesc *desc, int offset, unsigned short select, unsigned short type);
 
 extern void _asm_default_int();
 extern void _asm_keyboard_int();
@@ -45,35 +40,43 @@ struct idtr kidtr;
 struct idtdesc kidt[IDTSIZE];
 
 void _start(){
-	init_gdt();
+
+	_init_kernel_gdt();
+
 	asm("	movw $0x18, %ax \n \
 		movw %ax, %ss \n \
 		movl $0x20000, %esp");
 
-	main();
+        main();
+
+        while(1);
 }
 
 void main(void)
 {
-	int i = 0;
 
-	for(i=0; i < IDTSIZE; i++)
-		_init_idt_desc(&kidt[i], (unsigned int) _asm_default_int, 0x08, 0x8E00);
+    _clear();
+    _printk("Kernel is runnig ... ");
+//	int i = 0;
+
+//	for(i=0; i < IDTSIZE; i++)
+//		_init_idt_desc(&kidt[i], (unsigned int) _asm_default_int, 0x08, 0x8E00);
 		
-	_init_idt_desc(&kidt[33], (unsigned int) _asm_keyboard_int, 0x08, 0x8E00);
+//	_init_idt_desc(&kidt[33], (unsigned int) _asm_keyboard_int, 0x08, 0x8E00);
 
-	kidtr.limite = 0xFF*8;
-	kidtr.base = 0x800;
+//	kidtr.limite = 0xFF*8;
+//	kidtr.base = 0x800;
 
-	memcpy((char *) kidtr.base, (char *) kidt, kidtr.limite);
+//        memcpy((char *) kidtr.base, (char *) kidt, kidtr.limite);
 
-	asm("lidtl (kidtr)");
+//	asm("lidtl (kidtr)");
 
-	init_pic();
+//	init_pic();
 	
-	sti;
+//	sti;
 
-	_clear();
+//	_clear();
+//        _printk("OK");
 //	_gotoxy(5,5);
 //	_printk("TEST\t");
 //	_setattr(0x04);
