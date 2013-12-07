@@ -1,5 +1,6 @@
+%define STRING_INC
+
 GLOBAL _memcpy
-EXTERN _putcar
 
 _memcpy:
     push ebp

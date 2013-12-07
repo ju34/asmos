@@ -37,7 +37,7 @@ gdtptr:
 kgdt: resb GDTSIZE*8
 
 GLOBAL _init_gdt_desc, _init_kernel_gdt
-EXTERN _memcpy, _putcar
+
 ;-----------------------------------------------------------
 ; Name   : _init_gdt_desc(unsigned int base, unsigned int limit, unsigned char access, unsigned char other, struct gdtdesc *desc);
 ; Desc.  :
@@ -155,16 +155,21 @@ _init_kernel_gdt:
     mov word [gdtptr], (GDTSIZE * 8)
     mov dword [gdtptr+2], GDTBASE
 
-    push dword (GDTSIZE *8)
-    push dword kgdt
-    push dword GDTBASE
+    ;memcpy
+    push esi
+    push edi
+    push ecx
 
-    call _memcpy
-;    add esp, 12
-    pop eax
-    pop eax
-    pop eax
+    mov edi, GDTBASE
+    mov esi, kgdt
+    mov ecx, (GDTSIZE * 8)
 
+    rep
+    movsb
+
+    pop ecx
+    pop edi
+    pop esi
     
     lgdt [gdtptr]
 
