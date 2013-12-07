@@ -24,6 +24,6 @@ struct gdtr {
 } __attribute__ ((packed));
 
 extern void _init_gdt_desc(u32, u32, u8, u8, struct gdtdesc *);
-extern void _memcpy(char *dest, char *source, int size);
+extern void _init_kernel_gdt();
 
 #endif
